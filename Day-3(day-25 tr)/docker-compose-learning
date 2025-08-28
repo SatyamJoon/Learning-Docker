@@ -1,0 +1,220 @@
+#here we use Amazon ubuntu.
+yum install docker
+    2  docker --version
+    3  service docker start
+    4  mkdir project
+    5  cd project
+    6  touch index.html home.html signup.html login.html
+    7  ls
+    8  cd ..
+    9  ls
+   10  docker run -it --name sample ubuntu /bin/bash
+   11  docker ps
+   12  docker ps -a
+   13  docker start sample
+   14  docker attach sample
+   15  docker rm sample remove
+   16  docker rm sample
+   17  docker ps -a
+   18  docker run -it
+   19  docker run -it --name a2 -v /somyadeep ubuntu /bin/bash
+   20  docker volume ls
+   21  cd /var/lib/docker/volume
+   22  cd /var/lib/docker/volumes
+   23  ls
+   24  cd
+   25  b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   26  b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   27  cd
+   28  b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   29  cd b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   30  cd b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   31  pwd
+   32  cd /
+   33  pwd
+   34  cd volume b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   35  cd /var/lib/docker/volumes
+   36  cd volume b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   37  cd b6090920341cdcf87939522f2dc895038b9bcee7607f750e85d52496f542914d
+   38  ls
+   39  cd _data
+   40  ls
+   41  docker run -it --name a4 -v myvolumedata:/dockerdata ubuntu /bin/bash
+   42  docker volume ls
+   43  cd /var/lib/docker/volumes
+   44  ls
+   45  cd myvolumedata
+   46  ls
+   47  cd _data
+   48  ls
+   49  cd /home/ec2-user
+	                      copy data from a4 to a5(new) container
+   50  docker run -it --name a5 --privileged=true --volumes-from  a4 ubuntu /bin/bash
+	
+		copy data from deleted a4 conatiner to a6 container using volume(myvolumedata->volume-name)
+   56  docker volume ls
+   57  docker rm a4
+   58  docker ps -a
+   59  docker run -it --name a6 --privileged=true -v  myvolumedata
+   60  docker run -it --name a6 --privileged=true -v myvolumedata:/sinchan ubuntu /bin/bash
+       
+	Apply-Type-Bind-Volume
+   61  mkdir bindproject
+   62  docker run -it --name a7 -v /home/ec2-user/bindproject:/devops ubuntu /bin/bash
+   63  docker volume ls
+   64  ls
+   65  cd bindproject
+   66  ls
+   67  docker volume ls
+   68  docker volume inspect myvolumedata
+   69  cd ..
+	By using nginx
+   70  cd /home/ec2-user
+   71  pwd
+   72  docker volume create --name customerdb
+   73  docker volume ls
+   74  docker volume inspect customerdb
+   75  docker run -it -d --name web1 -v customerdb:/usr/share/nginx/html nginx
+   76  docker exec web1 bash -c "echo 'allow from web1' > /usr/share/nginx/html/index.html "
+   77  docker exec web1 curl localhost
+   78  mkdir nginxvolume
+   79  cd nginxvolume
+   80  vi index.html
+   81  vi index.html
+   82  cat index.html
+   83  nano Dockerfile
+		FROM nginx:alpine
+ 
+		VOLUME ["/usr/share/nginx/html"]
+ 
+		CMD ["nginx","-g","daemon off;"]
+ 
+   84  docker build -t nginx-volume .
+   85  docker run -d -it --name nginxweb -p 8080:80 -v $(pwd):/usr/share/nginx/html nginx-volume
+   86  docker ps -a
+   87  ls
+   88  docker volume ls
+   89  docker volume inspect customerdb
+   90  cd /var/lib/docker/volumes/customerdb/_data
+   91  ls
+
+
+		installing docker-compose
+    1  yum install docker -y
+
+    2  service docker start
+
+    3  docker ps -a
+
+    4  curl -SL https://github.com/docker/compose/releases/download/v2.39.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+
+    5  chmod +x /usr/local/bin/docker-compose
+
+    6  docker compose --version
+
+    7  ls
+
+    8  mkdir test-compose
+
+    9  cd test-compose/
+
+   10  ls
+
+   11  vi docker-compose.yaml
+		services:
+ 			 web:
+   			   image: nginx
+    		           ports:
+     			     - 8095:80
+  			 database:
+    			   image: redis
+
+   12  docker-compose config
+
+   13  docker-compose up
+
+   14  docker-compose up -d
+
+   15  docker ps -a
+
+   16  ls
+
+   17  cat docker-compose.yaml
+
+   18  docker-compose ps
+
+   19  docker ps -a
+
+   20  docker-compose stop
+
+   21  docker ps -a
+
+   22  docker-compose start
+
+   23  docker ps -a
+
+   24  history
+
+	--mkdir test-compose2
+ 	
+  183  docker compose start
+  184  docker ps
+  185  docker ps
+  186  vi docker-compose.yml
+  187  docker-compose up -d --scale database=3
+  188  docker compose up -d --scale database=3
+  189  docker ps
+
+
+
+		--Sql and Wordpress--
+  193  vi docker-wordpress.yml
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+volumes:
+    db_data: {}
+
+  194  docker-compose -f docker-wordpress.yml up -d
+  195  docker compose -f docker-wordpress.yml up -d
+        --Complete-project--
+   git clone https://github.com/Msocial123/docker-casestudy
+  219  git clonehttps://github.com/Msocial123/docker-casestudy
+  220  yum install git
+  221  git clone https://github.com/Msocial123/docker-casestudy
+  222  ls
+  223  cd docker-casestudy
+  224  ls
+  225  vi docker-compose.yml
+  226  docker ps -a
+  227  docker rm -f $(docker ps -aq)
+  228  docker ps
+  229  ls
+  230  docker compose up -d
+  231  docker ps -a
+  232  docker compose up
+  233  docker compose up -d
+
+
+ 
